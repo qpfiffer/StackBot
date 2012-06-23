@@ -1,0 +1,8 @@
+{
+    "server":       "server",
+    "nickname" :    "nickname",        
+    "realname":     "realname",
+    "channel":      "channel",
+    "password":     "password"
+} 
+
