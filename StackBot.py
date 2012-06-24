@@ -14,7 +14,7 @@ class StackBot(irc.bot.SingleServerIRCBot):
         self.config_json = json.load(self.config_file_handle)
         self.config_file_handle.close()
 
-        self.server = self.config_json["server"]
+        self.server = [(self.config_json["server"], 6667)];
         self.nickname = self.config_json["nickname"]        
         self.realname = self.config_json["realname"]
         self.channel = self.config_json["channel"]
