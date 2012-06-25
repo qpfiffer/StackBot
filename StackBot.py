@@ -24,13 +24,13 @@ class StackBot(irc.bot.SingleServerIRCBot):
         irc.bot.SingleServerIRCBot.__init__(self, self.server, self.nickname, self.realname)
         
         self.user_to_stack = {'nobody': ['nothing.', 'Get some work done.']}
-        self.commands = ['stats: Prints some stack stats (users, stack depth, etc.)', 'mystack: Prints your own stack', 'push <text>: Pushes <text> onto your stack.', 'help: Really? Come on.', 'pop: Pops the top item of the stack'] 
+        self.commands = ['Commands can be prefaced with stack or ' + self.nickname, 'stats: Prints some stack stats (users, stack depth, etc.)', 'mystack: Prints your own stack', 'push <text>: Pushes <text> onto your stack.', 'help: Really? Come on.', 'pop: Pops the top item of the stack'] 
        
     def on_welcome(self, c, e):
         c.join(self.channel, key=self.password)
 
     def on_pubmsg(self, c, e):
-        if self.nickname in e.arguments()[0]:
+        if self.nickname in e.arguments()[0] or 'stack' in e.arguments()[0]:
             # Make sure they were talking to us, and then print
             # their stack to the channel.
             user = nm_to_n(e.source())
