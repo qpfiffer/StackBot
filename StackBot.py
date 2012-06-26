@@ -28,7 +28,7 @@ class StackBot(irc.bot.SingleServerIRCBot):
         # Initialize:
         irc.bot.SingleServerIRCBot.__init__(self, self.server, self.nickname, self.realname)
         
-        self.commands = ['Commands can be prefaced with stack or ' + self.nickname, 'stats: Prints some stack stats (users, stack depth, etc.)', 'mystack: Prints your own stack', 'push <text>: Pushes <text> onto your stack.', 'help: Really? Come on.', 'pop: Pops the top item of the stack'] 
+        self.commands = ['Commands can be prefaced with stack or ' + self.nickname, 'mystack: Prints your own stack', 'push <text>: Pushes <text> onto your stack.', 'help: Really? Come on.', 'pop: Pops the top item of the stack'] 
        
     def on_welcome(self, c, e):
         c.join(self.channel, key=self.password)
@@ -49,10 +49,15 @@ class StackBot(irc.bot.SingleServerIRCBot):
         self.do_command(e.arguments()[0], c, user, user)
 
     def print_stack(self, connection, user, channel):
-        i = 0
         user_items = self.redis_handler.lrange(user, 0, -1)
+
+        if len(user_items) <= 0:
+            connection.privmsg(channel, "Stack Empty. Get to work.")
+            return
+
+        i = 0
         for item in user_items:
-            connection.privmsg(self.channel, "%(item_index)i:%(item_text)s" % {"item_index": i, "item_text": item})
+            connection.privmsg(channel, "%(item_index)i:%(item_text)s" % {"item_index": i, "item_text": item})
             i = i+1
         
     def do_command(self, command, connection, user, channel):
@@ -68,9 +73,9 @@ class StackBot(irc.bot.SingleServerIRCBot):
             stack_item = command.partition('push')[2]
 
             users_stack = self.redis_handler.lrange(user, 0, -1)
-            self.redis_handler.rpush(user, stack_item)
+            self.redis_handler.lpush(user, stack_item)
 
-            connection.privmsg(channel, "Added%(item)s to %(user)s\'s stack." % {"item": stack_item, "user": user})
+            self.print_stack(connection, user, channel)
             return
 
         elif 'help' in to_lowered:
@@ -79,7 +84,7 @@ class StackBot(irc.bot.SingleServerIRCBot):
             return
 
         elif 'pop' in to_lowered:
-            self.redis_handler.rpop(user)
+            self.redis_handler.lpop(user)
             self.print_stack(connection, user, channel)
             
             return
