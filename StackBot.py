@@ -36,6 +36,7 @@ class StackBot(irc.bot.SingleServerIRCBot):
     def on_pubmsg(self, c, e):
         arguments = e.arguments()[0]
 
+        #FIXME: StackBot crashes on weird input here sometimes.
         if self.nickname in arguments or 'stack' in arguments:
             # Make sure they were talking to us, and then print
             # their stack to the channel.
