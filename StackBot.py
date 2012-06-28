@@ -36,12 +36,18 @@ class StackBot(irc.bot.SingleServerIRCBot):
     def on_pubmsg(self, c, e):
         arguments = e.arguments()[0]
 
-        #FIXME: StackBot crashes on weird input here sometimes.
-        if self.nickname in arguments or 'stack' in arguments:
-            # Make sure they were talking to us, and then print
-            # their stack to the channel.
-            user = nm_to_n(e.source())
-            self.do_command(arguments, c, user, self.channel)
+        should_respond = False
+        try:
+            test_str = arguments.decode('ascii')
+            if self.nickname in arguments or 'stack' in arguments:
+                should_respond = True
+        except UnicodeDecodeError:
+            should_respond = False
+                
+        # Make sure they were talking to us, and then print
+        # their stack to the channel.
+        user = nm_to_n(e.source())
+        self.do_command(arguments, c, user, self.channel)
 
     def on_privmsg(self, c, e):
         # If this was a private message, just send the stack
