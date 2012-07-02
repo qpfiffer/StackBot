@@ -39,15 +39,16 @@ class StackBot(irc.bot.SingleServerIRCBot):
         should_respond = False
         try:
             test_str = arguments.decode('ascii')
-            if self.nickname in arguments or 'stack' in arguments:
+            if arguments.startswith(('stack', self.nickname)):
                 should_respond = True
         except UnicodeDecodeError:
             should_respond = False
                 
-        # Make sure they were talking to us, and then print
-        # their stack to the channel.
-        user = nm_to_n(e.source())
-        self.do_command(arguments, c, user, self.channel)
+        if (should_respond):
+            # Make sure they were talking to us, and then print
+            # their stack to the channel.
+            user = nm_to_n(e.source())
+            self.do_command(arguments, c, user, self.channel)
 
     def on_privmsg(self, c, e):
         # If this was a private message, just send the stack
